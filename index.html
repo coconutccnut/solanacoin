@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenClub.fun — Launch & Trade Meme Tokens on Solana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ===== RESET & ROOT ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060810;
+  --bg1:#0b0f1e;
+  --bg2:#101525;
+  --bg3:#141929;
+  --card:#131828;
+  --card2:#18202f;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --accent:#00e5ff;
+  --accent2:#7b61ff;
+  --accent3:#ff3cac;
+  --green:#00ff88;
+  --red:#ff4545;
+  --yellow:#ffd700;
+  --text:#e8eaf6;
+  --muted:#5a6480;
+  --muted2:#3d4560;
+  --radius:12px;
+  --radius-lg:18px;
+  --glow-accent:0 0 20px rgba(0,229,255,0.3);
+  --glow-green:0 0 20px rgba(0,255,136,0.3);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Syne',sans-serif;
+  font-size:14px;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 40% at 20% -10%,rgba(0,229,255,0.05) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 30% at 80% 110%,rgba(123,97,255,0.06) 0%,transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:2px}
+/* ===== TYPOGRAPHY ===== */
+h1,h2,h3{font-family:'Syne',sans-serif;font-weight:800}
+code,.mono{font-family:'Space Mono',monospace}
+/* ===== NAV ===== */
+#nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(6,8,16,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  height:58px;
+  display:flex;align-items:center;
+  padding:0 24px;gap:0;
+}
+.nav-logo{
+  font-family:'Space Mono',monospace;
+  font-size:17px;font-weight:700;
+  color:var(--accent);
+  letter-spacing:-1px;
+  margin-right:32px;
+  white-space:nowrap;
+  text-shadow:var(--glow-accent);
+}
+.nav-logo em{color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-btn{
+  background:none;border:none;color:var(--muted);
+  padding:7px 14px;border-radius:9px;
+  cursor:pointer;font-size:13px;font-family:'Syne',sans-serif;font-weight:600;
+  transition:all .15s;white-space:nowrap;
+}
+.nav-btn:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.nav-btn.active{background:rgba(0,229,255,0.1);color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.sol-ticker{
+  font-family:'Space Mono',monospace;
+  font-size:12px;color:var(--muted);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:8px;padding:5px 10px;
+}
+.sol-ticker span{color:var(--accent)}
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:none;border-radius:10px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-weight:700;
+  transition:all .15s;white-space:nowrap;
+}
+.btn:active{transform:scale(0.97)}
+.btn-primary{
+  background:var(--accent);color:#000;
+  padding:9px 20px;font-size:13px;
+}
+.btn-primary:hover{background:#33eeff;box-shadow:var(--glow-accent)}
+.btn-outline{
+  background:none;border:1px solid var(--border2);color:var(--text);
+  padding:8px 16px;font-size:13px;
+}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:8px}
+.btn-xs{padding:4px 10px;font-size:11px;border-radius:7px}
+.btn-green{background:rgba(0,255,136,0.15);color:var(--green);border:1px solid rgba(0,255,136,0.25)}
+.btn-green:hover{background:rgba(0,255,136,0.25);box-shadow:var(--glow-green)}
+.btn-red{background:rgba(255,69,69,0.15);color:var(--red);border:1px solid rgba(255,69,69,0.25)}
+.btn-red:hover{background:rgba(255,69,69,0.25)}
+.btn-ghost{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+/* ===== PAGES ===== */
+.page{display:none;padding:28px 24px;position:relative;z-index:1;min-height:calc(100vh - 58px)}
+.page.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.container{max-width:1280px;margin:0 auto}
+/* ===== CARDS ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.card-inner{padding:18px 20px}
+/* ===== BADGES ===== */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.5px}
+.badge-hot{background:rgba(255,60,172,0.15);color:#ff8ad0;border:1px solid rgba(255,60,172,0.3)}
+.badge-new{background:rgba(0,255,136,0.12);color:var(--green);border:1px solid rgba(0,255,136,0.25)}
+.badge-trend{background:rgba(255,215,0,0.12);color:var(--yellow);border:1px solid rgba(255,215,0,0.25)}
+.badge-king{background:rgba(123,97,255,0.2);color:#b3a6ff;border:1px solid rgba(123,97,255,0.4)}
+.badge-grad{background:rgba(0,229,255,0.12);color:var(--accent);border:1px solid rgba(0,229,255,0.25)}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+
+/* ======= HOME PAGE ======= */
+.hero{
+  text-align:center;
+  padding:48px 20px 40px;
+  max-width:800px;margin:0 auto 40px;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'Space Mono',monospace;font-size:11px;
+  color:var(--accent);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:20px;
+  background:rgba(0,229,255,0.07);
+  border:1px solid rgba(0,229,255,0.2);
+  border-radius:20px;padding:5px 14px;
+}
+.hero h1{
+  font-size:clamp(36px,6vw,68px);
+  line-height:1.05;
+  margin-bottom:16px;
+  letter-spacing:-2px;
+}
+.hero h1 .line2{
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p{
+  font-size:16px;color:var(--muted);line-height:1.7;
+  margin-bottom:28px;font-weight:400;
+}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
+.btn-hero{padding:13px 28px;font-size:15px;border-radius:12px}
+.stats-bar{
+  display:flex;gap:0;justify-content:center;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  max-width:700px;margin:0 auto;
+}
+.stat-block{
+  flex:1;padding:16px 10px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.stat-block:last-child{border-right:none}
+.stat-val{font-size:22px;font-weight:800;font-family:'Space Mono',monospace;color:var(--accent);line-height:1}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+
+/* section headers */
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.sec-hdr h2{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:var(--glow-green);animation:blink 1.4s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* home 2-col */
+.home-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-bottom:28px}
+@media(max-width:900px){.home-grid{grid-template-columns:1fr}}
+
+/* TOKEN CARD */
+.tok-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.tok-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:14px;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.tok-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,229,255,0.03),transparent 60%);
+  opacity:0;transition:.2s;pointer-events:none;
+}
+.tok-card:hover{border-color:rgba(0,229,255,0.3);transform:translateY(-2px)}
+.tok-card:hover::after{opacity:1}
+.tok-card:active{transform:scale(0.98)}
+.tc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tok-ico{
+  width:42px;height:42px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.tc-info{flex:1;min-width:0}
+.tc-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-sym{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted)}
+.tc-price{text-align:right}
+.tc-price .pv{font-family:'Space Mono',monospace;font-weight:700;font-size:13px}
+.tc-price .pc{font-size:10px;font-family:'Space Mono',monospace}
+.curve-wrap{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin:8px 0 6px;overflow:hidden}
+.curve-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.tc-foot{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--muted);font-family:'Space Mono',monospace}
+
+/* KING CARD */
+.king-card{
+  background:linear-gradient(135deg,var(--card2),var(--card));
+  border:1px solid rgba(123,97,255,0.3);
+  border-radius:var(--radius-lg);padding:18px;
+  cursor:pointer;transition:all .2s;
+}
+.king-card:hover{border-color:rgba(123,97,255,0.6);box-shadow:0 0 30px rgba(123,97,255,0.15)}
+.king-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.king-ico{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.king-title{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.king-sym{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
+.king-price{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--accent);text-shadow:var(--glow-accent)}
+.king-stats{display:flex;gap:16px;margin-top:12px;font-size:11px;font-family:'Space Mono',monospace;color:var(--muted)}
+.king-stats span b{color:var(--text)}
+
+/* LIVE FEED */
+.live-feed{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;
+  max-height:340px;
+}
+.feed-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.feed-hdr span{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.feed-body{overflow-y:auto;max-height:290px}
+.feed-body::-webkit-scrollbar{width:2px}
+.feed-body::-webkit-scrollbar-thumb{background:var(--muted2)}
+.fi{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.03);
+  animation:slotIn .3s ease;
+}
+@keyframes slotIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.fi:hover{background:rgba(255,255,255,0.02)}
+.fi-ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.fi-txt{flex:1;min-width:0}
+.fi-main{font-size:11px;line-height:1.4}
+.fi-main strong{color:var(--accent2)}
+.fi-time{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace}
+.fi-amt{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;flex-shrink:0}
+
+/* ======= EXPLORE PAGE ======= */
+.search-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-box{
+  flex:1;min-width:220px;
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:10px 16px;
+}
+.search-box input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:'Syne',sans-serif}
+.search-box input::placeholder{color:var(--muted)}
+.search-icon{color:var(--muted);font-size:15px}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.fil-btn{
+  padding:6px 15px;border-radius:20px;
+  background:none;border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-family:'Syne',sans-serif;font-weight:700;
+  cursor:pointer;transition:all .15s;
+}
+.fil-btn:hover,.fil-btn.active{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.35);color:var(--accent)}
+.sort-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.sort-btn{padding:4px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;font-family:'Space Mono',monospace;transition:all .15s}
+.sort-btn:hover,.sort-btn.active{border-color:var(--accent2);color:var(--accent2)}
+
+/* ======= CREATE PAGE ======= */
+.create-wrap{max-width:640px;margin:0 auto}
+.create-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px}
+.create-title{font-size:26px;font-weight:800;letter-spacing:-1px;margin-bottom:4px}
+.create-sub{font-size:13px;color:var(--muted);margin-bottom:26px;line-height:1.6}
+.fg{margin-bottom:18px}
+.fl{display:block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px}
+.fi-input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:11px 14px;color:var(--text);font-size:14px;font-family:'Syne',sans-serif;
+  outline:none;transition:border .15s;
+}
+.fi-input:focus{border-color:var(--accent)}
+.fi-input::placeholder{color:var(--muted2)}
+textarea.fi-input{resize:vertical;min-height:80px;line-height:1.5}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.upload-zone{
+  border:2px dashed var(--border2);border-radius:var(--radius-lg);
+  padding:28px;text-align:center;cursor:pointer;transition:all .2s;
+  background:rgba(255,255,255,0.02);
+}
+.upload-zone:hover{border-color:var(--accent);background:rgba(0,229,255,0.04)}
+.upload-zone.has-img{border-style:solid;border-color:var(--accent);padding:10px}
+.uz-ico{font-size:32px;margin-bottom:8px}
+.uz-txt{font-size:12px;color:var(--muted);line-height:1.5}
+.cost-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:16px}
+.cost-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:8px}
+.cost-row:last-child{margin-bottom:0;padding-top:10px;border-top:1px solid var(--border);font-weight:700}
+.cost-row label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.init-slider{width:100%;accent-color:var(--accent);margin-top:6px}
+.tok-preview{
+  background:var(--bg2);border:1px solid rgba(0,229,255,0.2);border-radius:var(--radius);
+  padding:14px;margin-top:14px;display:none;
+}
+.tok-preview.show{display:flex;align-items:center;gap:12px}
+.prev-ico{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--card);flex-shrink:0}
+.prev-info{flex:1}
+.prev-name{font-weight:700;font-size:15px;letter-spacing:-.3px}
+.prev-sym{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
+.prev-right{text-align:right}
+.prev-price{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent)}
+.prev-supply{font-size:10px;color:var(--muted)}
+.launch-btn{width:100%;padding:15px;font-size:16px;border-radius:14px;margin-top:18px}
+.success-banner{
+  background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.3);
+  border-radius:var(--radius);padding:16px;text-align:center;
+  margin-top:16px;display:none;
+}
+.success-banner.show{display:block;animation:fadeUp .3s ease}
+.success-banner h3{color:var(--green);font-size:16px;margin-bottom:4px}
+.success-banner p{font-size:12px;color:var(--muted)}
+
+/* ======= TOKEN DETAIL PAGE ======= */
+.detail-wrap{max-width:1200px;margin:0 auto}
+.detail-topbar{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.detail-ico{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.detail-info{flex:1;min-width:200px}
+.detail-name{font-size:26px;font-weight:800;letter-spacing:-1px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.detail-meta{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px}
+.detail-price-row{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+.detail-price{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:var(--text)}
+.detail-chg{font-family:'Space Mono',monospace;font-size:14px;font-weight:700}
+.detail-actions{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:700px){.metrics-row{grid-template-columns:1fr 1fr}}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.metric-card .ml{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.metric-card .mv{font-size:17px;font-weight:800;font-family:'Space Mono',monospace}
+.detail-cols{display:grid;grid-template-columns:1fr 340px;gap:18px}
+@media(max-width:1000px){.detail-cols{grid-template-columns:1fr}}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px}
+.chart-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap}
+.time-tabs{display:flex;gap:4px}
+.ttab{
+  padding:4px 12px;border-radius:8px;font-size:11px;font-family:'Space Mono',monospace;
+  background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.ttab.active{background:rgba(0,229,255,0.12);border-color:rgba(0,229,255,0.3);color:var(--accent)}
+.trade-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px}
+.trade-toggle{display:flex;gap:0;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:16px}
+.ttog{flex:1;padding:8px;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;transition:all .15s;color:var(--muted)}
+.ttog.buy.on{background:rgba(0,255,136,0.15);color:var(--green)}
+.ttog.sell.on{background:rgba(255,69,69,0.15);color:var(--red)}
+.amt-wrap{display:flex;gap:8px;margin-bottom:10px;align-items:stretch}
+.amt-wrap input{
+  flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:12px 14px;color:var(--text);font-size:17px;font-family:'Space Mono',monospace;font-weight:700;
+  outline:none;
+}
+.amt-wrap input:focus{border-color:var(--accent)}
+.sol-tag{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:0 14px;display:flex;align-items:center;font-family:'Space Mono',monospace;font-size:13px;color:var(--accent);white-space:nowrap;
+}
+.quick-row{display:flex;gap:5px;margin-bottom:14px}
+.qbtn{
+  flex:1;padding:5px 0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;cursor:pointer;text-align:center;transition:all .15s;
+}
+.qbtn:hover{border-color:var(--accent);color:var(--accent)}
+.trade-info-list{font-size:12px;color:var(--muted);margin-bottom:14px}
+.til-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.til-row:last-child{border-bottom:none}
+.til-row span:last-child{color:var(--text);font-family:'Space Mono',monospace}
+.exec-btn{width:100%;padding:13px;font-size:15px;border-radius:12px}
+.curve-info{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.curve-hdr{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.curve-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.curve-prog{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .3s}
+.curve-lbls{display:flex;justify-content:space-between;font-size:9px;font-family:'Space Mono',monospace;color:var(--muted);margin-top:5px}
+.curve-note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.curve-note b{color:var(--accent2)}
+.holders-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+.holders-card h3{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.holder-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.holder-num{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);width:18px}
+.holder-addr{font-family:'Space Mono',monospace;color:var(--accent2);flex:1}
+.holder-pct{font-family:'Space Mono',monospace;color:var(--text);width:40px;text-align:right;font-size:11px}
+.holder-bar{width:60px;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden}
+.holder-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px}
+.txn-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-top:16px}
+.txn-card table{width:100%;border-collapse:collapse}
+.txn-card th{
+  padding:10px 14px;font-family:'Space Mono',monospace;font-size:10px;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.5px;
+  background:var(--bg2);border-bottom:1px solid var(--border);text-align:left;
+}
+.txn-card td{padding:9px 14px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.03);font-family:'Space Mono',monospace}
+.txn-card tr:last-child td{border-bottom:none}
+.txn-card tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* ======= PORTFOLIO PAGE ======= */
+.portfolio-wrap{max-width:900px;margin:0 auto}
+.wallet-connect-screen{text-align:center;padding:80px 20px}
+.wallet-connect-screen .icon{font-size:56px;margin-bottom:20px}
+.wallet-connect-screen h2{font-size:24px;font-weight:800;margin-bottom:8px}
+.wallet-connect-screen p{color:var(--muted);margin-bottom:24px;font-size:14px}
+.port-header{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px 24px;margin-bottom:20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.port-avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.port-info h2{font-size:17px;font-weight:800;margin-bottom:3px}
+.port-info .addr{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
+.port-info .badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.sol-bal{margin-left:auto;text-align:right}
+.sol-bal .sv{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--accent)}
+.sol-bal .sl{font-size:11px;color:var(--muted)}
+.port-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:600px){.port-metrics{grid-template-columns:1fr 1fr}}
+.pm-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.pm-lbl{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.pm-val{font-size:18px;font-weight:800;font-family:'Space Mono',monospace}
+.holdings-table{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.holdings-table table{width:100%;border-collapse:collapse}
+.holdings-table th{padding:11px 16px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--bg2);border-bottom:1px solid var(--border);text-align:left}
+.holdings-table td{padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.holdings-table tr:last-child td{border-bottom:none}
+.holdings-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* ======= WALLET MODAL ======= */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);
+  z-index:500;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{
+  background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  padding:26px;width:360px;max-width:92vw;
+  transform:translateY(16px);transition:transform .2s;
+}
+.modal-overlay.open .modal-box{transform:none}
+.modal-box h3{font-size:20px;font-weight:800;margin-bottom:6px}
+.modal-box p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.wallet-opt{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;border:1px solid var(--border);border-radius:var(--radius);
+  cursor:pointer;margin-bottom:8px;transition:all .15s;
+}
+.wallet-opt:hover{border-color:var(--accent);background:rgba(0,229,255,0.04)}
+.wallet-opt .wo-ico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.wallet-opt .wo-name{font-weight:700;font-size:14px}
+.wallet-opt .wo-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.wallet-opt .wo-right{margin-left:auto;font-size:11px}
+.wo-detected{color:var(--green)}
+.modal-close{width:100%;margin-top:8px}
+
+/* ======= TOAST ======= */
+#toast{
+  position:fixed;bottom:28px;right:28px;z-index:600;
+  background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);
+  padding:12px 20px;font-size:13px;display:flex;align-items:center;gap:8px;
+  transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;
+  max-width:320px;
+}
+#toast.show{transform:none;opacity:1}
+#toast.t-success{border-color:rgba(0,255,136,0.4)}
+#toast.t-error{border-color:rgba(255,69,69,0.4)}
+.t-ico{font-size:16px}
+
+/* ===== MISC UTILS ===== */
+.addr-short{font-family:'Space Mono',monospace;color:var(--accent2)}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt28{margin-top:28px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.sec-gap{margin-bottom:32px}
+.color-accent{color:var(--accent)}
+.color-muted{color:var(--muted)}
+.fw700{font-weight:700}
+.ff-mono{font-family:'Space Mono',monospace}
+.connected-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;box-shadow:0 0 8px rgba(0,255,136,0.7)}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"><span class="t-ico" id="t-ico">✓</span><span id="t-msg">Done</span></div>
+
+<!-- WALLET MODAL -->
+<div class="modal-overlay" id="walletModal">
+  <div class="modal-box">
+    <h3>Connect Wallet</h3>
+    <p>Connect your Solana wallet to start launching and trading tokens instantly.</p>
+    <div class="wallet-opt" onclick="doConnect('Phantom')">
+      <div class="wo-ico" style="background:rgba(123,97,255,.18)">👻</div>
+      <div><div class="wo-name">Phantom</div><div class="wo-sub">Browser extension wallet</div></div>
+      <div class="wo-right wo-detected">● Detected</div>
+    </div>
+    <div class="wallet-opt" onclick="doConnect('Solflare')">
+      <div class="wo-ico" style="background:rgba(255,160,0,.15)">🔥</div>
+      <div><div class="wo-name">Solflare</div><div class="wo-sub">Official Solana wallet</div></div>
+    </div>
+    <div class="wallet-opt" onclick="doConnect('Backpack')">
+      <div class="wo-ico" style="background:rgba(255,60,172,.15)">🎒</div>
+      <div><div class="wo-name">Backpack</div><div class="wo-sub">xNFT-powered wallet</div></div>
+    </div>
+    <div class="wallet-opt" onclick="doConnect('Ledger')">
+      <div class="wo-ico" style="background:rgba(0,229,255,.1)">🔐</div>
+      <div><div class="wo-name">Ledger</div><div class="wo-sub">Hardware wallet</div></div>
+    </div>
+    <button class="btn btn-ghost btn-sm modal-close" onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">token<em>club</em>.fun</div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="nav('home',this)">◈ Home</button>
+    <button class="nav-btn" onclick="nav('explore',this)">⊞ Explore</button>
+    <button class="nav-btn" onclick="nav('create',this)">✦ Launch</button>
+    <button class="nav-btn" onclick="nav('portfolio',this)">◉ Portfolio</button>
+  </div>
+  <div class="nav-right">
+    <div class="sol-ticker">SOL <span id="solPriceTicker">$148.34</span></div>
+    <button class="btn btn-primary btn-sm" id="walletBtn" onclick="openModal()">Connect Wallet</button>
+  </div>
+</nav>
+
+<!-- ========================= HOME ========================= -->
+<div id="page-home" class="page active">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-eyebrow"><span>⬡</span> Solana · Fair Launch · No Presale</div>
+      <h1>Launch tokens.<br><span class="line2">Trade memes. Win big.</span></h1>
+      <p>The fastest memecoin launchpad on Solana. Create a fair-launch token in under 30 seconds. Bonding curve pricing — no liquidity needed.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-hero" onclick="nav('create',document.querySelectorAll('.nav-btn')[2])">✦ Launch a Token</button>
+        <button class="btn btn-outline btn-hero" onclick="nav('explore',document.querySelectorAll('.nav-btn')[1])">⊞ Explore Tokens</button>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-block"><div class="stat-val" id="s1">127,841</div><div class="stat-lbl">Tokens Launched</div></div>
+        <div class="stat-block"><div class="stat-val" id="s2">$4.3M</div><div class="stat-lbl">24h Volume</div></div>
+        <div class="stat-block"><div class="stat-val" id="s3">18,247</div><div class="stat-lbl">Active Traders</div></div>
+        <div class="stat-block"><div class="stat-val">0.02</div><div class="stat-lbl">SOL to Launch</div></div>
+      </div>
+    </div>
+
+    <div class="home-grid">
+      <div>
+        <div class="sec-hdr"><div class="pulse"></div><h2>King of the Hill</h2><span class="badge badge-king" style="margin-left:auto">👑 #1 Token</span></div>
+        <div id="kingCard" onclick=""></div>
+      </div>
+      <div>
+        <div class="sec-hdr"><div class="pulse"></div><h2>Live Trades</h2></div>
+        <div class="live-feed">
+          <div class="feed-hdr"><div class="pulse"></div><span>Real-time Activity</span></div>
+          <div class="feed-body" id="liveFeed"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-gap">
+      <div class="sec-hdr mt20"><h2>🔥 Trending</h2><span class="badge badge-trend" style="margin-left:auto">Hot right now</span></div>
+      <div class="tok-grid" id="trendGrid"></div>
+    </div>
+    <div class="sec-gap">
+      <div class="sec-hdr"><h2>✦ Just Launched</h2><span class="badge badge-new" style="margin-left:auto">New</span></div>
+      <div class="tok-grid" id="newGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= EXPLORE ========================= -->
+<div id="page-explore" class="page">
+  <div class="container">
+    <div class="search-row">
+      <div class="search-box"><span class="search-icon">⌕</span><input type="text" id="searchInp" placeholder="Search by name, ticker, or contract address..." oninput="doSearch()"></div>
+    </div>
+    <div class="filter-bar">
+      <button class="fil-btn active" onclick="setFilter('all',this)">All Tokens</button>
+      <button class="fil-btn" onclick="setFilter('trending',this)">🔥 Trending</button>
+      <button class="fil-btn" onclick="setFilter('new',this)">✦ New</button>
+      <button class="fil-btn" onclick="setFilter('graduating',this)">⬆ Graduating</button>
+      <button class="fil-btn" onclick="setFilter('graduated',this)">✅ Graduated</button>
+    </div>
+    <div class="sort-row">
+      <span>Sort by:</span>
+      <button class="sort-btn active" onclick="setSort('mcap',this)">Mkt Cap</button>
+      <button class="sort-btn" onclick="setSort('volume',this)">Volume</button>
+      <button class="sort-btn" onclick="setSort('change',this)">% Change</button>
+      <button class="sort-btn" onclick="setSort('new',this)">Newest</button>
+      <span style="margin-left:auto;font-family:'Space Mono',monospace;font-size:11px" id="exploreCount"></span>
+    </div>
+    <div class="tok-grid" id="exploreGrid"></div>
+  </div>
+</div>
+
+<!-- ========================= CREATE ========================= -->
+<div id="page-create" class="page">
+  <div class="create-wrap">
+    <div class="create-card">
+      <h1 class="create-title">Launch a Token</h1>
+      <p class="create-sub">Deploy a fair-launch SPL token on Solana in seconds. Bonding curve pricing, no liquidity seeding required. 0.02 SOL creation fee.</p>
+      <div class="fg">
+        <label class="fl">Token Image</label>
+        <div class="upload-zone" onclick="trigUp()" id="upZone">
+          <div class="uz-ico" id="upIco">🖼️</div>
+          <div class="uz-txt" id="upTxt">Click to upload image<br><span style="font-size:10px;opacity:.6">PNG, GIF, WEBP — 1:1 aspect ratio recommended</span></div>
+          <input type="file" accept="image/*" id="fileIn" style="display:none" onchange="handleImg(event)">
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Token Name *</label><input type="text" class="fi-input" id="cname" placeholder="e.g. Doge King" oninput="updatePrev()"></div>
+        <div class="fg"><label class="fl">Ticker *</label><input type="text" class="fi-input" id="cticker" placeholder="DKING" maxlength="10" oninput="this.value=this.value.toUpperCase();updatePrev()"></div>
+      </div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fi-input" id="cdesc" placeholder="Tell the community about your token..."></textarea></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Twitter / X</label><input type="text" class="fi-input" placeholder="https://twitter.com/..."></div>
+        <div class="fg"><label class="fl">Telegram</label><input type="text" class="fi-input" placeholder="https://t.me/..."></div>
+      </div>
+      <div class="fg"><label class="fl">Website</label><input type="text" class="fi-input" placeholder="https://yourtoken.fun"></div>
+      <div class="cost-box">
+        <div class="cost-row"><label>Creation fee</label><span class="ff-mono">0.02 SOL</span></div>
+        <div class="cost-row">
+          <label>Initial buy — <span id="ibShow" class="color-accent">0.0 SOL</span></label>
+          <input type="range" class="init-slider" min="0" max="5" step="0.1" value="0" id="ibSlider" oninput="document.getElementById('ibShow').textContent=parseFloat(this.value).toFixed(1)+' SOL';calcTotal()">
+        </div>
+        <div class="cost-row"><label>Total cost</label><span class="ff-mono color-accent" id="totalCost">0.02 SOL</span></div>
+      </div>
+      <div class="tok-preview" id="tokPrev">
+        <div class="prev-ico" id="prevIco">🚀</div>
+        <div class="prev-info">
+          <div class="prev-name" id="prevName">Token Name</div>
+          <div class="prev-sym" id="prevSym">$TICKER</div>
+        </div>
+        <div class="prev-right">
+          <div class="prev-price">$0.000001</div>
+          <div class="prev-supply">1B total supply</div>
+        </div>
+      </div>
+      <button class="btn btn-primary launch-btn" onclick="doLaunch()">✦ Launch Token</button>
+      <div class="success-banner" id="successBanner">
+        <h3>🎉 Token Launched Successfully!</h3>
+        <p id="successText">Your token is now live on Solana and instantly tradeable!</p>
+        <button class="btn btn-outline btn-sm mt8" onclick="nav('explore',document.querySelectorAll('.nav-btn')[1])">View on Explorer →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= PORTFOLIO ========================= -->
+<div id="page-portfolio" class="page">
+  <div class="portfolio-wrap">
+    <div id="portConnectScreen" class="wallet-connect-screen">
+      <div class="icon">◎</div>
+      <h2>Connect your wallet</h2>
+      <p>Connect your Solana wallet to view your portfolio, holdings, and trade history.</p>
+      <button class="btn btn-primary" onclick="openModal()">Connect Wallet</button>
+    </div>
+    <div id="portContent" style="display:none">
+      <div class="port-header">
+        <div class="port-avatar">🦊</div>
+        <div class="port-info">
+          <h2 id="portWalletName">Phantom Wallet</h2>
+          <div class="addr" id="portAddr">—</div>
+          <div class="badges mt8">
+            <span class="badge badge-new">Active Trader</span>
+            <span class="badge badge-king">Early Adopter</span>
+          </div>
+        </div>
+        <div class="sol-bal">
+          <div class="sv">12.48 SOL</div>
+          <div class="sl">≈ $1,849.52</div>
+          <button class="btn btn-outline btn-xs mt8">Deposit</button>
+        </div>
+      </div>
+      <div class="port-metrics">
+        <div class="pm-card"><div class="pm-lbl">Total PnL</div><div class="pm-val pos">+$2,847</div></div>
+        <div class="pm-card"><div class="pm-lbl">Tokens Held</div><div class="pm-val">7</div></div>
+        <div class="pm-card"><div class="pm-lbl">Total Trades</div><div class="pm-val">143</div></div>
+        <div class="pm-card"><div class="pm-lbl">Win Rate</div><div class="pm-val pos">64%</div></div>
+      </div>
+      <div class="sec-hdr mb12"><h2>Holdings</h2></div>
+      <div class="holdings-table">
+        <table>
+          <thead><tr><th>Token</th><th>Amount</th><th>Avg Buy</th><th>Current</th><th>Value</th><th>PnL</th><th></th></tr></thead>
+          <tbody id="holdBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= TOKEN DETAIL ========================= -->
+<div id="page-detail" class="page">
+  <div class="detail-wrap">
+    <div class="detail-topbar">
+      <div class="detail-ico" id="dIco" style="background:rgba(0,229,255,.1)">🚀</div>
+      <div class="detail-info">
+        <div class="detail-name" id="dName">Token <span class="badge badge-hot" id="dBadge">HOT</span></div>
+        <div class="detail-meta" id="dMeta">$TICKER • CA: 7Xmk...9Zzq</div>
+        <div class="detail-price-row">
+          <span class="detail-price" id="dPrice">$0.000012</span>
+          <span class="detail-chg pos" id="dChg">+24.5%</span>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn btn-green btn-sm" onclick="setTrade('buy')">Buy</button>
+        <button class="btn btn-red btn-sm" onclick="setTrade('sell')">Sell</button>
+        <button class="btn btn-ghost btn-sm" onclick="nav('explore',document.querySelectorAll('.nav-btn')[1])">← Back</button>
+      </div>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-card"><div class="ml">Market Cap</div><div class="mv" id="dMcap">$12,400</div></div>
+      <div class="metric-card"><div class="ml">24h Volume</div><div class="mv" id="dVol">$8,320</div></div>
+      <div class="metric-card"><div class="ml">Holders</div><div class="mv" id="dHolders">342</div></div>
+      <div class="metric-card"><div class="ml">Bonding Curve</div><div class="mv" id="dCurveVal">34%</div></div>
+    </div>
+    <div class="detail-cols">
+      <div>
+        <div class="chart-card">
+          <div class="chart-top">
+            <div class="time-tabs" id="timeTabs">
+              <button class="ttab active" onclick="switchTime('5m',this)">5m</button>
+              <button class="ttab" onclick="switchTime('1h',this)">1h</button>
+              <button class="ttab" onclick="switchTime('6h',this)">6h</button>
+              <button class="ttab" onclick="switchTime('24h',this)">24h</button>
+            </div>
+            <div class="ff-mono color-muted" style="font-size:11px" id="chartVolLbl">Vol 24h: $8,320</div>
+          </div>
+          <div style="position:relative;height:260px"><canvas id="priceChart" role="img" aria-label="Token price chart">Price chart</canvas></div>
+        </div>
+        <div class="txn-card">
+          <table>
+            <thead><tr><th>Type</th><th>SOL</th><th>Tokens</th><th>Wallet</th><th>Time</th></tr></thead>
+            <tbody id="txnBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="trade-card">
+          <div class="trade-toggle">
+            <div class="ttog buy on" id="buyTog" onclick="setTrade('buy')">Buy</div>
+            <div class="ttog sell" id="sellTog" onclick="setTrade('sell')">Sell</div>
+          </div>
+          <div style="font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);margin-bottom:6px">Amount (SOL)</div>
+          <div class="amt-wrap">
+            <input type="number" id="tradeAmt" value="0.1" min="0.001" step="0.1" placeholder="0.0">
+            <div class="sol-tag">◎ SOL</div>
+          </div>
+          <div class="quick-row">
+            <div class="qbtn" onclick="setQ(0.1)">0.1</div>
+            <div class="qbtn" onclick="setQ(0.5)">0.5</div>
+            <div class="qbtn" onclick="setQ(1)">1 SOL</div>
+            <div class="qbtn" onclick="setQ(5)">5 SOL</div>
+          </div>
+          <div class="trade-info-list">
+            <div class="til-row"><span>Est. receive</span><span id="tilReceive">~8,420 tokens</span></div>
+            <div class="til-row"><span>Price impact</span><span id="tilImpact" style="color:var(--yellow)">~0.8%</span></div>
+            <div class="til-row"><span>Platform fee (1%)</span><span id="tilFee">0.001 SOL</span></div>
+            <div class="til-row"><span>Min. received</span><span id="tilMin">~8,337 tokens</span></div>
+          </div>
+          <button class="btn btn-primary exec-btn" id="execBtn" onclick="doTrade()">Buy Tokens</button>
+        </div>
+        <div class="curve-info">
+          <div class="curve-hdr">Bonding Curve Progress</div>
+          <div class="curve-bar"><div class="curve-prog" id="curveProg" style="width:34%"></div></div>
+          <div class="curve-lbls"><span>0 SOL</span><span id="curveEst">→ 69 SOL to graduate</span></div>
+          <div class="curve-note">When the curve fills, liquidity is automatically added to <b>Raydium AMM</b> and the token graduates to open trading.</div>
+        </div>
+        <div class="holders-card">
+          <h3>Top Holders</h3>
+          <div id="holderRows"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= JS ========================= -->
+<script>
+// ====== DATA ======
+const EMOJIS=['🐸','🚀','🌙','🐶','🦊','💎','🍕','🎯','⚡','🔥','🐱','🦁','🎪','🌈','👾','🤖','🐋','🦄','💫','🍄','🏆','🐊','🎭','🦋','🍀'];
+const NAMES=['DogeKing','MoonCat','PumpFrog','ElonDog','SolApe','DiamondPaw','RocketFuel','MemeLord','SunPepe','CatCoin','GigaBrain','ChaosFrog','MegaPump','StarDust','PixelPepe','RoboSol','WhaleAlert','UniMoon','CosmicPepe','ShroomToken','TrophyBull','CrocBoss','DramaLlama','ButterFly','LuckyClover'];
+const TICKERS=['DKING','MCAT','PFROG','EDOG','SAPE','DPAW','RFUEL','MLORD','SPEPE','CATC','GBRAIN','CFROG','MPUMP','SDUST','PIXL','RSOL','WHALE','UMOON','COSMO','SHROOM','TROPHY','CROC','DRAMA','BFLY','LUCKY'];
+const DESCS=['The king of all doge memes on Solana, blessed by the moon.','A cat destined to reach escape velocity.','The frog that never stops pumping.','Community-driven dog token for the degen masses.','Original Solana ape — diamond hands only.','Diamonds are forever, so are these paws.','Pure rocket fuel for your portfolio.','Become the ultimate meme lord on Solana.','A Pepe blessed by the sun god.','Meow your way to generational wealth.'];
+const COLORS=['rgba(0,229,255,.15)','rgba(123,97,255,.15)','rgba(0,255,136,.15)','rgba(255,215,0,.12)','rgba(255,60,172,.15)','rgba(255,140,0,.12)'];
+const BADGE_TYPES=[['badge-hot','HOT'],['badge-new','NEW'],['badge-trend','TREND'],['badge-king','KING'],['badge-grad','DEX']];
+
+let tokens=[], walletOn=false, walletName='', activeFilter='all', activeSort='mcap', currentTok=null, priceChart=null;
+
+function rn(a,b){return Math.random()*(b-a)+a}
+function ri(a,b){return Math.floor(rn(a,b))}
+function fmt(n){if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toFixed(2)}
+function fmtP(n){if(n<0.0000001)return n.toExponential(2);if(n<0.00001)return n.toFixed(8);if(n<0.001)return n.toFixed(6);if(n<1)return n.toFixed(4);return n.toFixed(2)}
+function shortA(){return '0x'+Math.random().toString(36).substr(2,4)+'...'+Math.random().toString(36).substr(2,4)}
+function tAgo(){const s=ri(2,180);if(s<60)return s+'s';return Math.floor(s/60)+'m'}
+function randCA(){const c='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';return Array.from({length:44},()=>c[ri(0,c.length)]).join('')}
+
+function buildTokens(){
+  tokens=NAMES.map((name,i)=>({
+    id:i,name,ticker:TICKERS[i],
+    emoji:EMOJIS[i],color:COLORS[i%COLORS.length],
+    desc:DESCS[i%DESCS.length],
+    price:rn(0.00000005,0.005),
+    change:rn(-40,180),
+    mcap:rn(5000,2000000),
+    vol:rn(500,200000),
+    curve:rn(3,98),
+    badge:BADGE_TYPES[ri(0,BADGE_TYPES.length)],
+    created:Date.now()-ri(1e6,8.64e7),
+    holders:ri(20,5000),
+    txns:ri(50,10000),
+    graduated:Math.random()>0.75,
+    priceHist:Array.from({length:60},()=>rn(0.000001,0.005)),
+    ca:randCA()
+  }));
+}
+
+// ====== NAV ======
+function nav(page, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(page==='explore')renderExplore();
+  if(page==='portfolio')renderPortfolio();
+}
+
+// ====== TOKEN CARDS ======
+function tokCardHTML(t,idx){
+  const chgCls=t.change>=0?'pos':'neg';
+  const chgStr=(t.change>=0?'+':'')+t.change.toFixed(1)+'%';
+  return `<div class="tok-card" onclick="openDetail(${idx})">
+    <div class="tc-top">
+      <div class="tok-ico" style="background:${t.color}">${t.emoji}</div>
+      <div class="tc-info">
+        <div class="tc-name">${t.name}</div>
+        <div class="tc-sym">$${t.ticker}</div>
+      </div>
+      <div class="tc-price">
+        <div class="pv">$${fmtP(t.price)}</div>
+        <div class="pc ${chgCls}">${chgStr}</div>
+      </div>
+    </div>
+    <div class="curve-wrap"><div class="curve-fill" style="width:${Math.min(100,t.curve).toFixed(0)}%"></div></div>
+    <div class="tc-foot">
+      <span>Curve ${t.curve.toFixed(0)}%</span>
+      <span>${fmt(t.mcap)}</span>
+      <span class="badge ${t.badge[0]}">${t.badge[1]}</span>
+    </div>
+  </div>`;
+}
+
+function renderKing(){
+  const t=tokens[0];
+  const chgCls=t.change>=0?'pos':'neg';
+  document.getElementById('kingCard').innerHTML=`
+    <div class="king-card" onclick="openDetail(0)">
+      <div class="king-top">
+        <div class="king-ico" style="background:${t.color}">${t.emoji}</div>
+        <div style="flex:1">
+          <div class="king-title">${t.name}</div>
+          <div class="king-sym">$${t.ticker} • Curve ${t.curve.toFixed(0)}%</div>
+        </div>
+        <div style="text-align:right">
+          <div class="king-price">$${fmtP(t.price)}</div>
+          <div class="${chgCls}" style="font-family:'Space Mono',monospace;font-size:13px">${(t.change>=0?'+':'')+t.change.toFixed(1)}%</div>
+        </div>
+      </div>
+      <div class="curve-wrap" style="height:5px;margin-bottom:10px"><div class="curve-fill" style="width:${Math.min(100,t.curve).toFixed(0)}%"></div></div>
+      <div class="king-stats">
+        <span>Mcap <b>${fmt(t.mcap)}</b></span>
+        <span>Vol <b>${fmt(t.vol)}</b></span>
+        <span>Holders <b>${t.holders.toLocaleString()}</b></span>
+        <span>Trades <b>${t.txns.toLocaleString()}</b></span>
+      </div>
+    </div>`;
+}
+
+function renderTrending(){
+  const sorted=[...tokens].sort((a,b)=>b.change-a.change).slice(0,6);
+  document.getElementById('trendGrid').innerHTML=sorted.map(t=>tokCardHTML(t,t.id)).join('');
+}
+function renderNew(){
+  const sorted=[...tokens].sort((a,b)=>b.created-a.created).slice(0,6);
+  document.getElementById('newGrid').innerHTML=sorted.map(t=>tokCardHTML(t,t.id)).join('');
+}
+
+function renderExplore(){
+  const q=(document.getElementById('searchInp')||{value:''}).value.toLowerCase();
+  let list=[...tokens].filter(t=>{
+    if(q&&!t.name.toLowerCase().includes(q)&&!t.ticker.toLowerCase().includes(q)&&!t.ca.toLowerCase().includes(q))return false;
+    if(activeFilter==='trending')return t.change>30;
+    if(activeFilter==='new')return Date.now()-t.created<7.2e6;
+    if(activeFilter==='graduating')return t.curve>60&&!t.graduated;
+    if(activeFilter==='graduated')return t.graduated;
+    return true;
+  });
+  if(activeSort==='mcap')list.sort((a,b)=>b.mcap-a.mcap);
+  else if(activeSort==='volume')list.sort((a,b)=>b.vol-a.vol);
+  else if(activeSort==='change')list.sort((a,b)=>b.change-a.change);
+  else if(activeSort==='new')list.sort((a,b)=>b.created-a.created);
+  document.getElementById('exploreCount').textContent=list.length+' tokens';
+  document.getElementById('exploreGrid').innerHTML=list.map(t=>tokCardHTML(t,t.id)).join('');
+}
+function doSearch(){renderExplore()}
+function setFilter(f,el){
+  activeFilter=f;
+  document.querySelectorAll('.fil-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');renderExplore();
+}
+function setSort(s,el){
+  activeSort=s;
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');renderExplore();
+}
+
+// ====== LIVE FEED ======
+const feedActions=['bought','sold'];
+function addFeed(){
+  const feed=document.getElementById('liveFeed');
+  if(!feed)return;
+  const t=tokens[ri(0,tokens.length)];
+  const buy=Math.random()>0.45;
+  const sol=rn(0.05,8).toFixed(2);
+  const div=document.createElement('div');
+  div.className='fi';
+  div.innerHTML=`
+    <div class="fi-ico" style="background:${COLORS[ri(0,COLORS.length)]}">${EMOJIS[ri(0,EMOJIS.length)]}</div>
+    <div class="fi-txt">
+      <div class="fi-main"><strong>${shortA()}</strong> ${buy?'bought':'sold'} <strong>$${t.ticker}</strong></div>
+      <div class="fi-time">${tAgo()} ago</div>
+    </div>
+    <div class="fi-amt ${buy?'pos':'neg'}">${buy?'+':'-'}${sol} SOL</div>`;
+  feed.insertBefore(div,feed.firstChild);
+  while(feed.children.length>18)feed.removeChild(feed.lastChild);
+}
+
+// ====== DETAIL ======
+function openDetail(idx){
+  currentTok=tokens[idx];
+  const t=currentTok;
+  document.getElementById('dIco').textContent=t.emoji;
+  document.getElementById('dIco').style.background=t.color;
+  document.getElementById('dName').innerHTML=t.name+' <span class="badge '+t.badge[0]+'">'+t.badge[1]+'</span>';
+  document.getElementById('dMeta').textContent='$'+t.ticker+' • CA: '+t.ca.substr(0,8)+'...'+t.ca.substr(-6);
+  document.getElementById('dPrice').textContent='$'+fmtP(t.price);
+  const cc=document.getElementById('dChg');
+  cc.textContent=(t.change>=0?'+':'')+t.change.toFixed(1)+'%';
+  cc.className='detail-chg '+(t.change>=0?'pos':'neg');
+  document.getElementById('dMcap').textContent=fmt(t.mcap);
+  document.getElementById('dVol').textContent=fmt(t.vol);
+  document.getElementById('dHolders').textContent=t.holders.toLocaleString();
+  document.getElementById('dCurveVal').textContent=t.curve.toFixed(0)+'%';
+  document.getElementById('curveProg').style.width=Math.min(100,t.curve)+'%';
+  const remaining=Math.max(0,(69-(69*t.curve/100)));
+  document.getElementById('curveEst').textContent='→ '+remaining.toFixed(1)+' SOL to graduate';
+  document.getElementById('chartVolLbl').textContent='Vol 24h: '+fmt(t.vol);
+  renderTxns(t);renderHolders(t);renderChart(t);
+  nav('detail',null);
+}
+
+function renderChart(t){
+  const ctx=document.getElementById('priceChart').getContext('2d');
+  if(priceChart)priceChart.destroy();
+  const rising=t.change>=0;
+  const col=rising?'#00ff88':'#ff4545';
+  const colA=rising?'rgba(0,255,136,0.07)':'rgba(255,69,69,0.07)';
+  const labels=t.priceHist.map((_,i)=>i+'');
+  priceChart=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[{label:'Price',data:t.priceHist,borderColor:col,backgroundColor:colA,fill:true,tension:0.4,pointRadius:0,borderWidth:1.5}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>'$'+fmtP(v.parsed.y)}}},
+      scales:{
+        x:{display:false},
+        y:{position:'right',grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a6480',font:{size:10,family:"'Space Mono'"}, callback:v=>'$'+fmtP(v)}}
+      }
+    }
+  });
+}
+function switchTime(t,el){
+  document.querySelectorAll('.ttab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  if(currentTok){currentTok.priceHist=Array.from({length:60},()=>rn(currentTok.price*0.5,currentTok.price*2));renderChart(currentTok);}
+}
+function renderTxns(t){
+  const rows=Array.from({length:14},()=>{
+    const buy=Math.random()>0.4;
+    const sol=rn(0.05,5).toFixed(3);
+    const toks=Math.floor(rn(1000,9999999));
+    return `<tr>
+      <td><span class="badge ${buy?'badge-new':'badge-hot'}">${buy?'BUY':'SELL'}</span></td>
+      <td class="${buy?'pos':'neg'}" style="font-weight:700">${sol}</td>
+      <td>${toks.toLocaleString()}</td>
+      <td class="addr-short">${shortA()}</td>
+      <td style="color:var(--muted)">${tAgo()}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('txnBody').innerHTML=rows;
+}
+function renderHolders(t){
+  const pcts=[22,15,11,8,6,5,4,3];
+  document.getElementById('holderRows').innerHTML=pcts.map((p,i)=>`
+    <div class="holder-row">
+      <span class="holder-num">#${i+1}</span>
+      <span class="holder-addr">${shortA()}</span>
+      <span class="holder-pct">${p}%</span>
+      <div class="holder-bar"><div class="holder-fill" style="width:${p*4}%"></div></div>
+    </div>`).join('');
+}
+
+// ====== TRADE ======
+let tradeMode='buy';
+function setTrade(m){
+  tradeMode=m;
+  document.getElementById('buyTog').className='ttog buy'+(m==='buy'?' on':'');
+  document.getElementById('sellTog').className='ttog sell'+(m==='sell'?' on':'');
+  const btn=document.getElementById('execBtn');
+  btn.textContent=m==='buy'?'Buy Tokens':'Sell Tokens';
+  btn.style.background=m==='buy'?'var(--accent)':'var(--red)';
+  btn.style.color=m==='buy'?'#000':'#fff';
+}
+function setQ(v){
+  document.getElementById('tradeAmt').value=v;
+  const fee=(v*0.01).toFixed(3);
+  const recv=Math.floor(v/((currentTok?currentTok.price:0.00001)));
+  document.getElementById('tilReceive').textContent='~'+recv.toLocaleString()+' tokens';
+  document.getElementById('tilImpact').textContent='~'+(v*0.8).toFixed(1)+'%';
+  document.getElementById('tilFee').textContent=fee+' SOL';
+  document.getElementById('tilMin').textContent='~'+Math.floor(recv*0.99).toLocaleString()+' tokens';
+}
+function doTrade(){
+  if(!walletOn){openModal();return;}
+  const amt=parseFloat(document.getElementById('tradeAmt').value)||0;
+  if(amt<=0){toast('Enter a valid amount','error');return;}
+  toast(`${tradeMode==='buy'?'Bought':'Sold'} ${amt} SOL of $${currentTok?currentTok.ticker:'token'}! ✓`,'success');
+}
+
+// ====== CREATE ======
+function updatePrev(){
+  const n=document.getElementById('cname').value;
+  const s=document.getElementById('cticker').value;
+  const prev=document.getElementById('tokPrev');
+  if(n||s){
+    prev.classList.add('show');
+    document.getElementById('prevName').textContent=n||'Token Name';
+    document.getElementById('prevSym').textContent='$'+(s||'TICKER');
+  }else{prev.classList.remove('show');}
+}
+function calcTotal(){
+  const ib=parseFloat(document.getElementById('ibSlider').value)||0;
+  document.getElementById('totalCost').textContent=(0.02+ib).toFixed(2)+' SOL';
+}
+function trigUp(){document.getElementById('fileIn').click()}
+function handleImg(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    document.getElementById('upZone').classList.add('has-img');
+    document.getElementById('upIco').innerHTML=`<img src="${ev.target.result}" style="width:70px;height:70px;object-fit:cover;border-radius:10px">`;
+    document.getElementById('upTxt').textContent=f.name;
+    document.getElementById('prevIco').innerHTML=`<img src="${ev.target.result}" style="width:44px;height:44px;object-fit:cover;border-radius:10px">`;
+  };
+  r.readAsDataURL(f);
+}
+function doLaunch(){
+  const n=document.getElementById('cname').value.trim();
+  const s=document.getElementById('cticker').value.trim();
+  if(!n||!s){toast('Please fill in token name and ticker','error');return;}
+  if(!walletOn){openModal();return;}
+  const banner=document.getElementById('successBanner');
+  banner.classList.add('show');
+  document.getElementById('successText').textContent=`${n} ($${s}) is now live on Solana and instantly tradeable!`;
+  toast(`🎉 ${n} launched on Solana!`,'success');
+  tokens.unshift({id:tokens.length,name:n,ticker:s,emoji:EMOJIS[ri(0,EMOJIS.length)],color:COLORS[ri(0,COLORS.length)],desc:'New community token.',price:0.000001,change:0,mcap:1000,vol:0,curve:0,badge:['badge-new','NEW'],created:Date.now(),holders:1,txns:0,graduated:false,priceHist:Array.from({length:60},()=>0.000001),ca:randCA()});
+  tokens.forEach((t,i)=>t.id=i);
+}
+
+// ====== PORTFOLIO ======
+function renderPortfolio(){
+  if(!walletOn)return;
+  const rows=tokens.slice(0,7).map(t=>{
+    const amt=Math.floor(rn(1000,5000000));
+    const avg=t.price*rn(0.4,2);
+    const val=amt*t.price;
+    const pnl=((t.price-avg)/avg*100);
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:8px;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:14px">${t.emoji}</div>
+        <div><div style="font-weight:700;font-size:13px">${t.name}</div><div style="font-size:10px;font-family:'Space Mono';color:var(--muted)">$${t.ticker}</div></div>
+      </div></td>
+      <td>${amt.toLocaleString()}</td>
+      <td>$${fmtP(avg)}</td>
+      <td>$${fmtP(t.price)}</td>
+      <td style="font-weight:700">${fmt(val)}</td>
+      <td class="${pnl>=0?'pos':'neg'}" style="font-weight:700;font-family:'Space Mono'">${pnl>=0?'+':''}${pnl.toFixed(1)}%</td>
+      <td><button class="btn btn-primary btn-xs" onclick="openDetail(${t.id})">Trade</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('holdBody').innerHTML=rows;
+}
+
+// ====== WALLET ======
+function openModal(){document.getElementById('walletModal').classList.add('open')}
+function closeModal(){document.getElementById('walletModal').classList.remove('open')}
+function doConnect(name){
+  walletOn=true;walletName=name;
+  closeModal();
+  const btn=document.getElementById('walletBtn');
+  btn.innerHTML=`<span class="connected-dot"></span>${name.substr(0,4)}...${Math.random().toString(36).substr(2,5).toUpperCase()}`;
+  btn.classList.remove('btn-outline');
+  document.getElementById('portConnectScreen').style.display='none';
+  document.getElementById('portContent').style.display='block';
+  document.getElementById('portWalletName').textContent=name+' Wallet';
+  document.getElementById('portAddr').textContent='0x'+Math.random().toString(36).substr(2,8)+'...'+Math.random().toString(36).substr(2,6);
+  renderPortfolio();
+  toast('✓ Wallet connected: '+name,'success');
+}
+document.getElementById('walletModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+// ====== TOAST ======
+function toast(msg,type='success'){
+  const el=document.getElementById('toast');
+  document.getElementById('t-ico').textContent=type==='success'?'✓':'✕';
+  document.getElementById('t-msg').textContent=msg;
+  el.className='toast t-'+type+' show';
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+// ====== LIVE STATS ======
+function animateStats(){
+  let n=127841,v=4.3,tr=18247,sol=148.34;
+  setInterval(()=>{n+=ri(1,4);document.getElementById('s1').textContent=n.toLocaleString()},2800);
+  setInterval(()=>{v+=rn(-0.08,0.15);v=Math.max(3.5,v);document.getElementById('s2').textContent='$'+v.toFixed(1)+'M'},5500);
+  setInterval(()=>{tr+=ri(-2,5);tr=Math.max(15000,tr);document.getElementById('s3').textContent=tr.toLocaleString()},4200);
+  setInterval(()=>{sol+=rn(-0.5,0.9);sol=Math.max(100,sol);document.getElementById('solPriceTicker').textContent='$'+sol.toFixed(2)},3800);
+}
+
+// ====== INIT ======
+buildTokens();
+renderKing();
+renderTrending();
+renderNew();
+animateStats();
+for(let i=0;i<10;i++)addFeed();
+setInterval(addFeed,2200);
+</script>
+</body>
+</html>
